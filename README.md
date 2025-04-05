@@ -4,7 +4,7 @@
 
 A modern web application starter template built with Next.js 14 (App Router), featuring authentication via [Clerk](https://clerk.com/) and a real-time backend/database powered by [SpacetimeDB](https://spacetimedb.com/).
 
-This template provides a solid foundation with a pre-configured SpacetimeDB Rust module, automatic client-side bindings generation, and a basic UI example demonstrating interaction.
+This template provides a solid foundation with a pre-configured SpacetimeDB Rust module, automatic client-side bindings generation, and a basic UI example demonstrating interaction. **It has been enhanced with testing, improved structure, type safety, and automated code quality tooling.**
 
 ## Tech Stack
 
@@ -14,6 +14,11 @@ This template provides a solid foundation with a pre-configured SpacetimeDB Rust
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
 - **UI Components:** [shadcn/ui](https://ui.shadcn.com/)
 - **SpacetimeDB Module Language:** [Rust](https://www.rust-lang.org/)
+- **Testing:** [Vitest](https://vitest.dev/), [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
+- **Schema Validation:** [Zod](https://zod.dev/) (for Environment Variables)
+- **Linting:** [ESLint](https://eslint.org/)
+- **Formatting:** [Prettier](https://prettier.io/)
+- **Git Hooks:** [Husky](https://typicode.github.io/husky/), [lint-staged](https://github.com/okonet/lint-staged)
 
 ## Prerequisites
 
@@ -36,10 +41,11 @@ Follow these steps carefully to get the project running locally:
     cd <project-directory>
     ```
 
-2.  **Install Node.js Dependencies:**
+2.  **Install Node.js Dependencies & Setup Husky:**
     ```bash
     npm install
     # or yarn install / pnpm install
+    # This will also automatically run the "prepare" script to set up Husky hooks.
     ```
 
 3.  **Install SpacetimeDB CLI:**
@@ -109,14 +115,15 @@ The template uses the following defaults in `.env.example` for local development
 ## Environment Variables (`.env` file)
 
 ```env
-# Clerk Authentication (Required)
+# Clerk Authentication (Required - Validated on Startup)
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxxxxx # Replace with your key
 CLERK_SECRET_KEY=sk_test_xxxxxx                # Replace with your key
 
-# SpacetimeDB (Defaults for local development)
-NEXT_PUBLIC_SPACETIMEDB_URI=ws://localhost:3000
-SPACETIMEDB_DB_NAME=cosine_module
+# SpacetimeDB (Required - Validated on Startup)
+NEXT_PUBLIC_SPACETIMEDB_URI=ws://localhost:3000 # Default for local dev
+SPACETIMEDB_DB_NAME=cosine_module             # Default for local dev
 ```
+*Note: Required environment variables are now validated on application startup using Zod (see `lib/env.ts`). The application will fail to start if required variables are missing or invalid.*
 
 ## Features
 
@@ -126,28 +133,81 @@ SPACETIMEDB_DB_NAME=cosine_module
 -   🎨 Modern UI with [Tailwind CSS](https://tailwindcss.com/) & [shadcn/ui](https://ui.shadcn.com/)
 -   🔄 Automatic Client Bindings Generation (`spacetime generate`)
 -   📱 Responsive Design
+-   ✅ Unit & Integration Testing Setup ([Vitest](https://vitest.dev/) + [React Testing Library](https://testing-library.com/))
+-   🔒 Environment Variable Validation ([Zod](https://zod.dev/))
+-   💅 Automated Linting & Formatting ([ESLint](https://eslint.org/), [Prettier](https://prettier.io/), [Husky](https://typicode.github.io/husky/), [lint-staged](https://github.com/okonet/lint-staged))
+-   📂 Organized Project Structure (Features, UI, Layout, Hooks, Types, Lib)
 
 ## Project Structure
 
+The project follows a structured approach for better organization and scalability:
+
 ```
 <project-directory>/
-├── app/                # Next.js app router pages
-├── components/         # React components (UI)
-├── utils/              # Utility functions (incl. SpacetimeDB connect)
+├── app/                # Next.js app router pages & layouts
+├── components/         # React components
+│   ├── ui/             # Reusable presentational components (e.g., Shadcn UI)
+│   ├── features/       # Feature-specific components (grouped by feature)
+│   ├── layout/         # Page layout structure components (Navbar, Footer, Sidebar)
+│   ├── auth/           # Authentication-related UI components
+│   └── providers/      # Context providers (ThemeProvider, etc.)
+├── hooks/              # Custom React hooks (reusable logic, e.g., useIsMounted)
+├── lib/                # Shared libraries, utilities, and configuration logic
+│   ├── env.ts          # Environment variable validation (Zod schema)
+│   └── spacetimedb/    # Scaffold for future complex SpacetimeDB client logic
+├── types/              # Shared TypeScript type definitions (interfaces, types)
+├── utils/              # General utility functions (incl. SpacetimeDB connect helper)
 ├── public/             # Static assets (images, fonts, etc.)
-├── src/                # Source files (non-page components, types)
+├── src/
 │   └── spacetimedb/    # Generated SpacetimeDB client bindings (DO NOT EDIT MANUALLY)
 ├── spacetime_module/   # SpacetimeDB Rust module source code
 │   ├── src/
 │   │   └── lib.rs      # Main Rust module logic (tables, reducers)
 │   └── Cargo.toml      # Rust dependencies
 ├── documentation/      # Placeholder for project-specific docs (optional)
+├── .husky/             # Husky Git hooks configuration (pre-commit)
 ├── .env.example        # Environment variable template
 ├── .env                # Local environment variables (ignored by git)
-├── next.config.mjs     # Next.js configuration
-├── package.json        # Node.js dependencies
-└── tsconfig.json       # TypeScript configuration
+├── .eslintrc.json      # ESLint configuration
+├── .gitignore
+├── .prettierrc         # Prettier configuration
+├── next.config.mjs     # Next.js configuration (imports lib/env.ts for validation)
+├── package.json        # Node.js dependencies & scripts
+├── postcss.config.mjs  # PostCSS configuration
+├── tailwind.config.ts  # Tailwind CSS configuration
+├── tsconfig.json       # TypeScript configuration
+├── vitest.config.ts    # Vitest test runner configuration
+└── vitest.setup.ts     # Vitest setup file (imports @testing-library/jest-dom)
 ```
+
+**Key Directory Explanations:**
+-   `components/`: Organized into subdirectories:
+    -   `ui/`: Generic, reusable UI blocks.
+    -   `features/`: Components specific to a feature domain (e.g., `profile/`, `chat/`).
+    -   `layout/`: Structural components (wrappers, navigation, footer).
+    -   `auth/`: Clerk/authentication related UI.
+    -   `providers/`: React context providers.
+-   `hooks/`: Contains custom React hooks to encapsulate reusable stateful logic (e.g., `useIsMounted`).
+-   `lib/`: Houses shared logic modules. `env.ts` uses Zod for runtime environment variable validation. `spacetimedb/` is prepared for future complex client interactions.
+-   `types/`: Central location for shared TypeScript interfaces and type aliases (e.g., `UserProfile`, `ApiResponse`).
+-   `.husky/`: Contains Git hooks, currently a `pre-commit` hook managed by Husky.
+
+## Enhanced Tooling & Workflow
+
+### Testing
+-   **Framework:** Vitest and React Testing Library are configured.
+-   **Running Tests:** Use `npm run test` for a single run or `npm run test:watch` for interactive watch mode.
+-   **Test Files:** Tests are typically co-located with the component or hook they test (e.g., `button.test.tsx` alongside `button.tsx`). Follow the `*.test.tsx` or `*.spec.tsx` naming convention.
+
+### Linting and Formatting
+-   **Tools:** ESLint and Prettier are configured for code quality and style consistency. The Tailwind CSS Prettier plugin is included.
+-   **Automation:** Husky and lint-staged are set up to automatically lint and format staged files (`.ts`, `.tsx`, `.js`, `.jsx`, `.css`, `.md`, `.json`) **before** each commit. This ensures code consistency in the repository.
+-   **Manual Checks:**
+    -   Run `npm run lint` to check for ESLint issues.
+    -   Run `npm run format` to format the entire project with Prettier.
+
+### Environment Validation
+-   The application now validates required environment variables on startup using the schema defined in `lib/env.ts`. If validation fails (e.g., missing `CLERK_SECRET_KEY`), the application will throw an error and exit, preventing runtime issues caused by misconfiguration.
 
 ## Development Workflow Notes
 
@@ -156,6 +216,7 @@ SPACETIMEDB_DB_NAME=cosine_module
     1.  **Rebuild & Regenerate:** Repeat **Step 5** (Build Module & Generate Bindings) from "Getting Started". This is essential to update the backend logic and the frontend's view of it.
     2.  **Restart SpacetimeDB:** Stop (`Ctrl+C`) and restart the `spacetime start` process (Terminal 1) to load the newly built module.
 -   **Frontend Logic:** Modify TypeScript/React code in `app/`, `components/`, `utils/`, etc. The Next.js dev server (Terminal 2) usually hot-reloads these changes automatically.
+-   **Testing:** Write tests for new components and hooks. Run `npm run test` or `npm run test:watch` frequently.
 
 ## Contributing
 
