@@ -1,0 +1,55 @@
+{
+  "name": "spacetime",
+  "description": "SpaceTimeDB MCP server for Eve's memory module",
+  "version": "1.0.0",
+  "tools": [
+    {
+      "name": "start_spacetime",
+      "description": "Start the SpaceTimeDB server",
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "publish_module",
+      "description": "Publish a module to SpaceTimeDB",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "module_name": {
+            "type": "string",
+            "description": "Name of the module to publish"
+          },
+          "project_path": {
+            "type": "string",
+            "description": "Path to the project"
+          }
+        },
+        "required": ["module_name", "project_path"]
+      }
+    },
+    {
+      "name": "create_entity",
+      "description": "Create a new entity in Eve's memory",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The unique name of the entity"
+          },
+          "entity_type": {
+            "type": "string",
+            "description": "The type of entity"
+          },
+          "data_json": {
+            "type": "string",
+            "description": "JSON string containing entity data"
+          }
+        },
+        "required": ["name"]
+      }
+    }
+  ]
+} 

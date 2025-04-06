@@ -1,0 +1,43 @@
+{
+  "mcpServers": {
+    "mcp-search": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-search"
+      ]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    },
+    "eve-memory": {
+      "command": "node",
+      "args": ["C:\\EVE\\Eve Personal Assistant\\eve-memory-mcp-server.js"],
+      "env": {
+        "MEMORY_DB_PATH": "C:\\EVE\\Eve Personal Assistant\\eve-memory-db",
+        "MEMORY_MODULE_PATH": "C:\\EVE\\Eve Personal Assistant\\eve_memory_module"
+      }
+    },
+    "spacetime": {
+      "command": "node",
+      "args": ["C:\\EVE\\Eve Personal Assistant\\spacetime-mcp-server.js"]
+    },
+    "mcp-browserbase": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@browserbasehq/mcp-browserbase",
+        "--key",
+        "7b9b74c8-5ead-4afd-8434-711762ea51e2"
+      ]
+    }
+  }
+} 

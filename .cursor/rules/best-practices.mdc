@@ -1,4 +1,9 @@
 ---
+description: 
+globs: 
+alwaysApply: false
+---
+---
 description: Best practices to implement for the tech stack used
 globs: 
 alwaysApply: true
@@ -92,17 +97,6 @@ globs: **/*.{tsx,jsx}
 - Implement complex animations using `useAnimation` hook
 - Optimize performance by using `layoutId` for shared layout animations
 - Leverage variants for reusable animation definitions
-
----
-name: supabase-best-practices.mdc
-description: Best practices for using Supabase in your application
-globs: **/*.{ts,tsx}
----
-
-- Use Supabase's real-time capabilities for live updates
-- Implement proper error handling and retries for network requests
-- Utilize Supabase's authentication features for user management
-- Optimize queries using Supabase's built-in filtering and sorting
 
 ---
 name: clerk-best-practices.mdc
